@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>82SS - Your AI Assistant</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+    <style>
+      #branding {
+        text-align: center;
+        font-size: 36px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #ffffff; /* Make it stand out more */
+      }
+      .user-message {
+        align-self: flex-end;
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        max-width: 60%;
+        font-size: 18px;
+        word-wrap: break-word;
+      }
+      .bot-message {
+        align-self: flex-start;
+        background-color: #f1f1f1;
+        color: #333;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        max-width: 60%;
+        font-size: 18px;
+        word-wrap: break-word;
+      }
+      #history-sidebar {
+        width: 25%; /* Restore the original size */
+        background-color: rgba(255, 255, 255, 0.8);
+        overflow-y: auto;
+        padding: 20px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        border-right: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      #chat-log {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main-container">
+      <div id="history-sidebar">
+        <h2>Chat History</h2>
+        <div id="history-sections">
+          <div id="today-section">
+            <h3>Today</h3>
+            <ul id="today-list"></ul>
+          </div>
+          <div id="yesterday-section">
+            <h3>Yesterday</h3>
+            <ul id="yesterday-list"></ul>
+          </div>
+          <div id="previous-week-section">
+            <h3>Previous 7 Days</h3>
+            <ul id="previous-week-list"></ul>
+          </div>
+        </div>
+      </div>
+      <div id="chat-container">
+        <div id="chat-box">
+          <!-- Centralized 82SS Branding -->
+          <div id="branding">82SS</div>
+          <div id="chat-log"></div>
+          <form id="chat-form">
+            <input
+              type="text"
+              id="user-input"
+              autocomplete="off"
+              placeholder="Type a message..."
+            />
+            <button type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      const chatForm = document.getElementById("chat-form");
+      const chatLog = document.getElementById("chat-log");
+      const userInput = document.getElementById("user-input");
+      const todayList = document.getElementById("today-list");
+      const yesterdayList = document.getElementById("yesterday-list");
+      const previousWeekList = document.getElementById("previous-week-list");
+
+      let currentSessionId = Date.now(); // A simple way to create a unique ID
+
+      window.onload = function () {
+        loadSessionHistory();
+      };
+
+      function loadSessionHistory() {
+        const sessionHistory =
+          JSON.parse(localStorage.getItem("sessionHistory")) || [];
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+
+        const todayDateString = getDateString(today);
+        const yesterdayDateString = getDateString(yesterday);
+        const sevenDaysAgoString = getDateString(sevenDaysAgo);
+
+        todayList.innerHTML = "";
+        yesterdayList.innerHTML = "";
+        previousWeekList.innerHTML = "";
+
+        sessionHistory.forEach((session, index) => {
+          const sessionDate = new Date(session.sessionId);
+          const sessionDateString = getDateString(sessionDate);
+          const li = document.createElement("li");
+          li.textContent = `Session ${
+            index + 1
+          } (${sessionDate.toLocaleString()})`;
+          li.addEventListener("click", () => loadSession(index));
+
+          if (sessionDateString === todayDateString) {
+            todayList.appendChild(li);
+          } else if (sessionDateString === yesterdayDateString) {
+            yesterdayList.appendChild(li);
+          } else if (sessionDateString >= sevenDaysAgoString) {
+            previousWeekList.appendChild(li);
+          }
+        });
+      }
+
+      function getDateString(date) {
+        return date.toISOString().split("T")[0];
+      }
+
+      function saveMessageToSession(message, response) {
+        let sessionHistory =
+          JSON.parse(localStorage.getItem("sessionHistory")) || [];
+        let session = sessionHistory.find(
+          (s) => s.sessionId === currentSessionId
+        );
+
+        if (!session) {
+          session = { sessionId: currentSessionId, messages: [] };
+          sessionHistory.push(session);
+        }
+
+        session.messages.push({
+          message,
+          response,
+          timestamp: new Date().toISOString(),
+        });
+        localStorage.setItem("sessionHistory", JSON.stringify(sessionHistory));
+        loadSessionHistory();
+      }
+
+      function loadSession(index) {
+        const sessionHistory =
+          JSON.parse(localStorage.getItem("sessionHistory")) || [];
+        const session = sessionHistory[index];
+
+        if (session) {
+          chatLog.innerHTML = "";
+          session.messages.forEach((chat) => {
+            const userMessageElement = document.createElement("div");
+            userMessageElement.textContent = "You: " + chat.message;
+            userMessageElement.classList.add("user-message");
+            chatLog.appendChild(userMessageElement);
+
+            const botMessageElement = document.createElement("div");
+            botMessageElement.textContent = "82SS: " + chat.response;
+            botMessageElement.classList.add("bot-message");
+            chatLog.appendChild(botMessageElement);
+          });
+        }
+      }
+
+      chatForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const userMessage = userInput.value.trim();
+        if (!userMessage) return;
+
+        const userMessageElement = document.createElement("div");
+        userMessageElement.textContent = "You: " + userMessage;
+        userMessageElement.classList.add("user-message");
+        chatLog.appendChild(userMessageElement);
+
+        fetch("/chat", {
+          method: "POST",
+          body: new URLSearchParams("message=" + userMessage),
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const botMessageElement = document.createElement("div");
+            botMessageElement.textContent = "82SS: " + data.response;
+            botMessageElement.classList.add("bot-message");
+            chatLog.appendChild(botMessageElement);
+
+            // Scroll to the latest message
+            chatLog.scrollTop = chatLog.scrollHeight;
+
+            // Save the chat history in the current session
+            saveMessageToSession(userMessage, data.response);
+          });
+
+        userInput.value = "";
+        chatLog.scrollTop = chatLog.scrollHeight; // Scroll to the bottom
+      });
+    </script>
+  </body>
+</html>

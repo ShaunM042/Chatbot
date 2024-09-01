@@ -1,0 +1,209 @@
+body {
+    font-family: "Arial", sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-image: linear-gradient(120deg, #a6c0fe 0%, #f68084 100%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    overflow: hidden;
+}
+
+#main-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+#history-sidebar {
+    width: 22%; /* Slightly reduced the width */
+    background-color: rgba(255, 255, 255, 0.8);
+    overflow-y: auto;
+    padding: 15px; /* Reduced padding */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Reduced shadow */
+    border-right: 1px solid rgba(0, 0, 0, 0.1); 
+}
+
+#history-sidebar h2 {
+    margin-top: 0;
+}
+
+#history-sections h3 {
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-size: 18px; /* Slightly reduced font size */
+}
+
+#history-list, #today-list, #yesterday-list, #previous-week-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#history-list li, #today-list li, #yesterday-list li, #previous-week-list li {
+    margin-bottom: 8px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    background-color: #f0f0f0; /* Changed the highlight color */
+    transition: background-color 0.3s ease;
+    font-size: 16px; /* Adjusted for better readability */
+}
+
+#history-list li:hover, #today-list li:hover, #yesterday-list li:hover, #previous-week-list li:hover {
+    background-color: #d1d1d1; /* Darker shade for hover */
+}
+
+#chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.2); 
+    border-radius: 0px;
+    overflow: hidden;
+}
+
+#chat-box {
+    flex: 1;
+    padding: 15px; /* Reduced padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-y: auto;
+}
+
+#chat-log {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 10px; /* Reduced padding */
+    font-size: 22px; /* Slightly reduced font size */
+    line-height: 1.4; /* Adjusted line height */
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center messages horizontally */
+}
+
+#chat-log .message {
+    width: 100%; /* Ensure messages span the width of the chat log */
+    max-width: 600px; /* Limit the width for readability */
+    padding: 12px 15px; /* Adjusted padding */
+    margin-bottom: 12px; /* Space between messages */
+    border-radius: 8px; /* Rounded corners for the boxes */
+    word-wrap: break-word;
+    color: #333; /* Standard text color */
+}
+
+#chat-log .user-message {
+    background-color: #007bff; /* Distinct blue background for user messages */
+    color: #ffffff; /* White text for user messages */
+    align-self: flex-end; /* Align user messages to the right */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+}
+
+#chat-log .bot-message {
+    background-color: #ffffff; /* White background for bot messages */
+    color: #333; /* Standard text color */
+    align-self: flex-start; /* Align bot messages to the left */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+    border-radius: 8px; /* Bubble-like appearance */
+    padding: 12px 15px; /* Adjusted padding */
+    max-width: 60%; /* Limit the width for readability */
+    word-wrap: break-word;
+}
+
+#branding {
+    text-align: center;
+    font-size: calc(24px + 2vw); /* Responsive font size */
+    font-weight: 700; /* Bolder */
+    margin-bottom: 30px;
+    background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px; /* Increase spacing between letters */
+}
+
+#user-input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 25px; /* More rounded for a polished look */
+    border: 1px solid #ccc;
+    font-size: 28px; /* Adjusted font size */
+    outline: none;
+    margin-right: 10px;
+}
+
+button {
+    padding: 12px 20px;
+    border-radius: 25px; /* Match the rounded input */
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#chat-box form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8); 
+    padding: 10px;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Updated Scrollbar */
+#chat-log {
+    scrollbar-width: auto;
+    scrollbar-color: #007bff #e0e7ff;
+}
+
+#chat-log::-webkit-scrollbar {
+    width: 12px;
+}
+
+#chat-log::-webkit-scrollbar-track {
+    background: #e0e7ff;
+    border-radius: 10px;
+}
+
+#chat-log::-webkit-scrollbar-thumb {
+    background-color: #007bff;
+    border-radius: 10px;
+    border: 3px solid #e0e7ff;
+}
+
+#chat-log::-webkit-scrollbar-thumb:hover {
+    background-color: #0056b3;
+}
+
+.session-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f0f0f0; /* Changed the highlight color */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 18px; /* Increased font size for readability */
+}
+
+.session-item:hover {
+    background-color: #d1d1d1; /* Darker shade for hover */
+}
